@@ -1,9 +1,12 @@
 export interface GetStationsParams {
   // TODO: add params
-  TODO: 'TODO';
+  // TODO: 'TODO';
+  query: string;
 }
 
 export interface GetConnectionsParams {
   // TODO: add params
-  TODO: 'TODO';
+  // TODO: 'TODO';
+  from: string;
+  to: string;
 }

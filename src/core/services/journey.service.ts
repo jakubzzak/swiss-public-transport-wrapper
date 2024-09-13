@@ -1,9 +1,9 @@
-import { Kysely } from 'kysely';
 import { Injectable } from '@nestjs/common';
+import { Kysely, sql } from 'kysely';
 import { InjectDb } from '~/infra/database';
-import { JourneyModel } from '../models';
 import { GetJourneyArgs } from '../args/get-journey.args';
 import { SaveJourneyArgs } from '../args/save-journey.args';
+import { JourneyModel } from '../models';
 
 @Injectable()
 export class JourneyService {
@@ -39,11 +39,22 @@ export class JourneyService {
 
   public async getJourney(args: GetJourneyArgs): Promise<JourneyModel> {
     // TODO: implement fetchig journey from database
-    return {} as any;
+    const res = await sql<
+      JourneyModel[]
+    >`select * from journey where id=${args.id}`.execute(this.db);
+    return res.rows[0][0];
   }
 
   public async saveJourney(args: SaveJourneyArgs): Promise<string> {
     // TODO: implement saving journey to database, returning the id.
-    return 'not-a-real-id';
+    const res = await this.db.transaction().execute(async (trx) => {
+      const values = [args.from, args.to, JSON.stringify(args.via)];
+      return await sql<
+        JourneyModel[]
+      >`insert into journey (id, from, to, via) values ${sql.join(
+        values,
+      )} returning *`.execute(trx);
+    });
+    return res.rows[0][0].id;
   }
 }

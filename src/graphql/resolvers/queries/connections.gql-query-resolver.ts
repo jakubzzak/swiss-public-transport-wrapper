@@ -1,4 +1,4 @@
-import { Resolver, Query, Args } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GetConnectionsArgs } from '~/core/args';
 import { ConnectionListModel } from '~/core/models';
 import { ConnectionService } from '~/core/services';
@@ -12,6 +12,6 @@ export class ConnectionsGqlQueryResolver {
     @Args() args: GetConnectionsArgs,
   ): Promise<ConnectionListModel> {
     // TODO: implement fetching connections from connection service
-    return {} as any;
+    return await this.connectionService.getConnections(args);
   }
 }
