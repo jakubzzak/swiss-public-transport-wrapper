@@ -1,4 +1,4 @@
-interface SaveJourneyStation {
+export interface SaveJourneyStation {
   id: string;
   name: string;
   coordinates: {

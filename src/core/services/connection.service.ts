@@ -1,20 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { OpendataService, StationSchema } from '~/infra/opendata';
+import { OpendataService } from '~/infra/opendata';
 import { GetConnectionsArgs } from '../args/get-connections.args';
+import {
+  decodeCursor,
+  encodeCursor,
+  mapStation,
+  toDateString,
+  toTimeString,
+} from '../helpers';
 import { ConnectionListModel } from '../models';
 
 @Injectable()
 export class ConnectionService {
+  private maxConnections = 2;
+
   constructor(private readonly opendataService: OpendataService) {}
 
   public async getConnections(
     args: GetConnectionsArgs,
   ): Promise<ConnectionListModel> {
-    // TODO: get connections from the OpenData service
+    const page = decodeCursor(args.after ?? undefined);
     const connections = await this.opendataService.getConnections({
       from: args.from,
       to: args.to,
+      via: args.via ?? undefined,
+      date: args.departsAt ? toDateString(args.departsAt) : undefined,
+      time: args.departsAt ? toTimeString(args.departsAt) : undefined,
+      page,
+      limit: this.maxConnections,
     });
+
     return {
       nodes: connections.map((connection) => ({
         from: mapStation(connection.from.station),
@@ -29,19 +44,11 @@ export class ConnectionService {
         })),
       })),
       pageInfo: {
-        endCursor: 'todo',
+        endCursor:
+          connections.length < this.maxConnections
+            ? null
+            : encodeCursor(page + 1),
       },
     };
   }
 }
-
-const mapStation = (station: StationSchema) => {
-  return {
-    id: station.id,
-    name: station.name,
-    coordinates: {
-      latitude: station.coordinate.x,
-      longitude: station.coordinate.y,
-    },
-  };
-};

@@ -6,6 +6,7 @@ import { ConnectionSchema, StationSchema } from './schemas';
 
 @Injectable()
 export class OpendataService {
+  private baseUrl = 'https://transport.opendata.ch/v1/';
   /**
    * The `HttpService` is a wrapper around the `Axios` HTTP client.
    * If you are not familiar with the Nest.js `HttpService`, feel free to use the underlying Axios instance directly.
@@ -18,16 +19,34 @@ export class OpendataService {
    */
   constructor(private httpService: HttpService) {}
 
+  public async getStationById(id: string): Promise<StationSchema> {
+    const res = await this.httpService.axiosRef.get('stationboard', {
+      baseURL: this.baseUrl,
+      params: { id },
+    });
+
+    return {
+      id: res.data.station.id,
+      name: res.data.station.name,
+      coordinate: {
+        x: res.data.station.coordinate.x,
+        y: res.data.station.coordinate.y,
+      },
+    } as StationSchema;
+  }
+
   public async getStations(
     params: GetStationsParams,
   ): Promise<StationSchema[]> {
-    // TODO: ✅ implement fetching stations from OpenData API
-    const url = `https://transport.opendata.ch/v1/locations?query=${params.query}&type=station`;
     const res: { stations: object[] } = await lastValueFrom(
-      this.httpService.get(url).pipe(map((resp) => resp.data)),
+      this.httpService
+        .get('locations', {
+          baseURL: this.baseUrl,
+          params: { ...params, type: 'station' },
+        })
+        .pipe(map((resp) => resp.data)),
     );
 
-    // console.log('ress', res);
     return res.stations
       .map(
         (station: any) =>
@@ -46,9 +65,6 @@ export class OpendataService {
   public async getConnections(
     params: GetConnectionsParams,
   ): Promise<ConnectionSchema[]> {
-    const url = `http://transport.opendata.ch/v1/connections?from=${params.from}&to=${params.to}&limit=2`;
-    // const url = `https://transport.opendata.ch/v1/stationboard?id=${params.stationId}&limit=2`;
-    // TODO: implement fetching connections from OpenData API
     const res: {
       connections: {
         from: {
@@ -61,22 +77,27 @@ export class OpendataService {
           arrival: string;
         };
         sections: {
-          journey: {
-            passList: {
-              station: StationSchema;
-              arrival: string;
-              departure: string;
-              departureTimestamp: number;
-            }[];
+          departure: {
+            station: StationSchema;
+            arrival: string;
+            departure: string;
+            departureTimestamp: number;
+          };
+          arrival: {
+            station: StationSchema;
+            arrival: string;
+            departure: string;
+            departureTimestamp: number;
           };
         }[];
       }[];
       from: StationSchema;
       to: StationSchema;
     } = await lastValueFrom(
-      this.httpService.get(url).pipe(map((resp) => resp.data)),
+      this.httpService
+        .get('connections', { baseURL: this.baseUrl, params })
+        .pipe(map((resp) => resp.data)),
     );
-    console.log(res);
 
     return res.connections.map((connection) => ({
       from: {
@@ -88,17 +109,7 @@ export class OpendataService {
         station: connection.to.station,
         arrival: connection.to.arrival,
       },
-      sections: connection.sections[0]?.journey.passList.map((section) => ({
-        departure: {
-          station: section.station,
-          departure: section.departure,
-          departureTimestamp: section.departureTimestamp,
-        },
-        arrival: {
-          station: section.station,
-          arrival: section.arrival,
-        },
-      })),
+      sections: connection.sections,
     }));
   }
 }

@@ -11,7 +11,6 @@ export class ConnectionsGqlQueryResolver {
   public async connections(
     @Args() args: GetConnectionsArgs,
   ): Promise<ConnectionListModel> {
-    // TODO: implement fetching connections from connection service
     return await this.connectionService.getConnections(args);
   }
 }

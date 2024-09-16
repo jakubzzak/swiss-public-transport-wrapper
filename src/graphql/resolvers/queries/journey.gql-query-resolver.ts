@@ -9,7 +9,6 @@ export class JourneyGqlQueryResolver {
 
   @Query(() => JourneyModel)
   public async journey(@Args() args: GetJourneyArgs): Promise<JourneyModel> {
-    // TODO: implement fetching journey from journey service
-    return {} as any;
+    return await this.journeyService.getJourney({ id: args.id });
   }
 }
