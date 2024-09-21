@@ -1,7 +1,9 @@
+import * as moment from 'moment';
+
 export const toDateString = (date: Date) => {
-  // TODO: implement date to date string conversion
+  return moment(date).format('YYYY-MM-DD');
 };
 
 export const toTimeString = (date: Date) => {
-  // TODO: implement date to time string conversion
+  return moment(date).format('HH:mm');
 };

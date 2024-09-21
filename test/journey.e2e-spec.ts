@@ -1,10 +1,10 @@
-import * as request from 'supertest';
-import { KYSELY_MODULE_CONNECTION_TOKEN, KyselyModule } from 'nestjs-kysely';
-import { Pool } from 'pg';
-import { Kysely, PostgresDialect } from 'kysely';
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Kysely, PostgresDialect, sql } from 'kysely';
+import { KYSELY_MODULE_CONNECTION_TOKEN, KyselyModule } from 'nestjs-kysely';
+import { Pool } from 'pg';
+import * as request from 'supertest';
 import { GraphqlModule } from '~/graphql/graphql.module';
 
 describe('journey resolvers', () => {
@@ -38,7 +38,14 @@ describe('journey resolvers', () => {
   });
 
   afterAll(async () => {
-    // TODO: (OPTIONAL) drop contents from all tables
+    const tables =
+      await sql`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`.execute(
+        db,
+      );
+
+    for (const table of tables.rows as { table_name: string }[]) {
+      db.deleteFrom(table.table_name);
+    }
   });
 
   const saveJourneyMutation = `
