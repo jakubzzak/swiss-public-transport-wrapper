@@ -1,12 +1,3 @@
-## Instructions
-
-1. 🎉  This assignment is sent to **selected candidates** as part of **our selection process.** You are one of them, congrats!
-2. ⏳ We assume that this task will take around **150 minutes**.
-3. ⏲️ After 150 minutes, please **stop** and to submit what you’ve managed to complete within this time. We appreciate your time deeply and don’t want to take up more of it during this stage of the interview process.
-4. 🤔  If you have any questions about the assignment, please **don't hesitate to ask**!
-5. 🍀  **Good luck** with the assignment!
-6. 📣  Please **notify us** once you have finished your assignment so we can review it.
-
 ## Introduction
 
 The Swiss rail network is the densest in Europe and public transport is an integral part of the life of almost every person living in Switzerland. But what good would this extensive network do, if there was no way to easily look up these connections?
@@ -109,22 +100,3 @@ This mutation should save a journey to the database. To do so, it should fetch t
 This query should return a single journey from the database. It is crucial that this query does **not** fetch any data from the external API but queries the database to fulfill the request. Naturally, if the `connections` field on the journey is requested, it is required to fetch those from the [OpenData Transport API](https://transport.opendata.ch). The following requirements apply:
 
 - raw SQL or Kysely DSL should be used to interact with the database
-
-## General Remarks
-
-The following remarks apply to the entire assignment:
-
-- You don't have to implement any input validation
-- You don't have to implement any authentication or authorization mechanisms
-- You don't have to implement any special error handling. If an error occurs, you can simply throw the error and let the GraphQL server handle it.
-- You don't have to write any tests for your code.
-
-## Submission
-
-Once you have completed the assignment, you can either commit your changes to the repository you cloned in the beginning and send us the link, or you can send us a zip file with your solution.
-
-## Closing Notes
-
-In order for us to improve our interview process and make it a pleasant experience for all candidates, we are very much interested in hearing about how you experienced this assignment. If you have any feedback, please don’t hesitate to share it with us.
-
-Last but not least, **best of luck** with your assignment! We look forward to reviewing your work and discussing it with you.
